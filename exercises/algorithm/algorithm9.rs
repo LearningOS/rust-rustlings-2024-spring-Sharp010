@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -23,7 +22,7 @@ where
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: vec![T::default()],        // 下标从1开始
             comparator,
         }
     }
@@ -37,7 +36,38 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.count+=1;
+        self.items.push(value);
+        self.up(self.count);
+    }
+
+    pub fn pop(&mut self) -> Option<T>{
+        if self.is_empty() {return None;}
+        self.items.swap(1, self.count);
+        self.count-=1;
+        self.down(1);
+        Some(self.items.remove(self.count+1))
+    }
+
+    fn up(&mut self,idx: usize){
+        if self.parent_idx(idx)<=0 {
+            return;
+        }
+        let parent=self.parent_idx(idx);
+        if (self.comparator)(&self.items[idx],&self.items[parent]) {
+            self.items.swap(idx, parent);
+        }
+        self.up(parent);
+    }
+
+    fn down(&mut self,idx: usize){
+        if !self.children_present(idx) {
+            return ;
+        } 
+        let smallest=self.smallest_child_idx(idx);
+        if smallest==idx {return ;}
+        self.items.swap(idx, smallest);
+        self.down(smallest);
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +87,11 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let mut ret=idx;
+        let (left,right)=(self.left_child_idx(idx),self.right_child_idx(idx));
+        if left <=self.count &&(self.comparator)(&self.items[left],&self.items[ret]) {ret=left;}
+        if right <=self.count && (self.comparator)(&self.items[right],&self.items[ret]) {ret=right;}
+        ret
     }
 }
 
@@ -84,8 +117,8 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        self.pop()
+		// None
     }
 }
 
@@ -130,8 +163,8 @@ mod tests {
         heap.add(9);
         heap.add(11);
         assert_eq!(heap.len(), 4);
-        assert_eq!(heap.next(), Some(2));
-        assert_eq!(heap.next(), Some(4));
+        assert_eq!(heap.next(), Some(2));println!("heap-{} done!",2);
+        assert_eq!(heap.next(), Some(4));println!("heap-{} done!",4);
         assert_eq!(heap.next(), Some(9));
         heap.add(1);
         assert_eq!(heap.next(), Some(1));

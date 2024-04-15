@@ -1,8 +1,9 @@
 /*
 	queue
-	This question requires you to use queues to implement the functionality of the stac
+	This question requires you to use queues to implement the functionality of the stack
 */
-// I AM NOT DONE
+
+use std::arch::x86_64::_CMP_FALSE_OQ;
 
 #[derive(Debug)]
 pub struct Queue<T> {
@@ -55,27 +56,57 @@ impl<T> Default for Queue<T> {
 pub struct myStack<T>
 {
 	//TODO
+    q1_enable:bool,
 	q1:Queue<T>,
 	q2:Queue<T>
 }
 impl<T> myStack<T> {
     pub fn new() -> Self {
         Self {
-			//TODO
+			q1_enable:true,
 			q1:Queue::<T>::new(),
 			q2:Queue::<T>::new()
         }
     }
     pub fn push(&mut self, elem: T) {
-        //TODO
+        match self.q1_enable {
+            true =>{
+                self.q1.enqueue(elem)
+            }
+            false =>{
+                self.q2.enqueue(elem)
+            }
+        }
     }
     pub fn pop(&mut self) -> Result<T, &str> {
-        //TODO
-		Err("Stack is empty")
+        match self.q1_enable {
+            true =>{
+                if self.q1.is_empty() {return Err("Stack is empty");}
+                for _ in 1..self.q1.size(){
+                    self.q2.enqueue(self.q1.dequeue().unwrap());
+                } 
+                self.q1_enable=false;
+                self.q1.dequeue()
+            }
+            false =>{
+                if self.q2.is_empty() {return Err("Stack is empty");}
+                for _ in 1..self.q2.size(){
+                    self.q1.enqueue(self.q2.dequeue().unwrap());
+                } 
+                self.q1_enable=true;
+                self.q2.dequeue()
+            }
+        }
     }
     pub fn is_empty(&self) -> bool {
-		//TODO
-        true
+		match self.q1_enable {
+            true =>{
+                self.q1.is_empty()
+            }
+            false =>{
+                self.q2.is_empty()
+            }
+        }
     }
 }
 
